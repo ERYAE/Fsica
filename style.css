@@ -1,0 +1,79 @@
+/* * ARQUIVO: styles.css
+ * STATUS: Otimizado para GPU
+ * THEME: Dark Cyberpunk / Physics Lab
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scrollbar Customizada (Porque a padrão do Windows é feia demais) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(2, 6, 23, 0.5);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.3);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.6);
+}
+
+/* Utilitários de Perspectiva 3D */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* Efeitos de Glow de Texto */
+.text-glow {
+  text-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+}
+.text-glow-amber {
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+/* Animações Globais */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Classes Utilitárias Complexas */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.holographic-overlay {
+  background-image: linear-gradient(
+    180deg,
+    rgba(6, 182, 212, 0) 0%,
+    rgba(6, 182, 212, 0.05) 50%,
+    rgba(6, 182, 212, 0) 100%
+  );
+  background-size: 100% 4px;
+}
