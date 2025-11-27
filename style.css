@@ -1,79 +1,67 @@
-/* * ARQUIVO: styles.css
- * STATUS: Otimizado para GPU
- * THEME: Dark Cyberpunk / Physics Lab
- */
-
+/* * ARQUIVO: styles.css * */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Scrollbar Customizada (Porque a padrão do Windows é feia demais) */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Scrollbar invisível mas funcional para estética limpa */
+.custom-scrollbar::-webkit-scrollbar { width: 0px; background: transparent; }
+
+/* Utilitários 3D e Glow */
+.perspective-1000 { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.text-glow { text-shadow: 0 0 10px rgba(34, 211, 238, 0.8); }
+
+/* Animações */
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(6,182,212,0.2); } 50% { box-shadow: 0 0 40px rgba(6,182,212,0.6); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-shake { animation: shake 0.3s ease-in-out; }
+.animate-enter { animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* --- SLIDER CUSTOMIZADO (O segredo do "tato" visual) --- */
+input[type=range] {
+  -webkit-appearance: none; 
+  background: transparent; 
+  cursor: pointer;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(2, 6, 23, 0.5);
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.3);
+input[type=range]:focus { outline: none; }
+
+/* O Trilho */
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(15, 23, 42, 0.8);
   border-radius: 99px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(6, 182, 212, 0.6);
-}
-
-/* Utilitários de Perspectiva 3D */
-.perspective-1000 {
-  perspective: 1000px;
-}
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-/* Efeitos de Glow de Texto */
-.text-glow {
-  text-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
-}
-.text-glow-amber {
-  text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
-}
-
-/* Animações Globais */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%) skewX(-15deg); }
-  100% { transform: translateX(200%) skewX(-15deg); }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Classes Utilitárias Complexas */
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.glass-panel {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.holographic-overlay {
-  background-image: linear-gradient(
-    180deg,
-    rgba(6, 182, 212, 0) 0%,
-    rgba(6, 182, 212, 0.05) 50%,
-    rgba(6, 182, 212, 0) 100%
-  );
-  background-size: 100% 4px;
+/* O Botão (Thumb) */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+  background: #22d3ee; /* Cyan-400 */
+  border: 2px solid #fff;
+  margin-top: -9px; /* Centralizar no trilho */
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.8);
+  transition: transform 0.1s;
+}
+input[type=range]:active::-webkit-slider-thumb {
+  transform: scale(1.3);
+  background: #fff;
+  box-shadow: 0 0 25px rgba(34, 211, 238, 1);
+}
+
+/* Glassmorphism Refinado */
+.glass-panel {
+  background: rgba(30, 41, 59, 0.4); /* Mais escuro para contraste */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
 }
