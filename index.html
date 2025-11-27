@@ -2,662 +2,589 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Laboratório de Física: Indução</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Física M2C - Indução Eletromagnética</title>
     
-    <!-- Tailwind CSS -->
+    <!-- 1. Importação do Tailwind CSS (Estilos) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel -->
+    <!-- 2. Importmap para gerenciar dependências React e Lucide -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.303.0"
+        }
+    }
+    </script>
+
+    <!-- 3. Babel Standalone para compilar JSX no navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- Estilos Globais Customizados -->
     <style>
-        body { 
-            overscroll-behavior: none; 
-            overflow: hidden; 
-            background-color: #020617; 
-            font-family: 'Inter', system-ui, sans-serif;
-            color: #e2e8f0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+        body { margin: 0; overflow: hidden; background-color: #020617; color: white; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; } 
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } 
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .text-glow { text-shadow: 0 0 20px rgba(6,182,212,0.5); }
         
-        /* Fundo Tecnológico Animado */
-        .tech-bg {
-            background-image: 
-                linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            perspective: 1000px;
-        }
-
-        /* Efeitos de Vidro e Neon */
-        .glass {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-        
-        .neon-text {
-            text-shadow: 0 0 10px rgba(6, 182, 212, 0.6), 0 0 30px rgba(6, 182, 212, 0.3);
-        }
-
-        /* Animações */
-        .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Controles de Slider Premium */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-            height: 32px;
-            cursor: grab;
-            touch-action: none;
-        }
-        input[type=range]:active { cursor: grabbing; }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #22d3ee;
-            margin-top: -9px;
-            box-shadow: 0 0 0 4px rgba(8, 51, 68, 1), 0 0 15px rgba(34, 211, 238, 0.8);
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); background: #a5f3fc; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Animações de brilho e float */
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
 </head>
 <body>
-    <div id="root" class="h-screen w-screen"></div>
+    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
-        const { createRoot } = ReactDOM;
+    <!-- 4. Aplicação React Completa -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+          ArrowRight, ArrowLeft, Zap, Magnet, Globe, Menu, X, 
+          CheckCircle, AlertCircle, RefreshCw, Layers, RotateCw, BookOpen, 
+          ChevronRight, ThumbsUp, GraduationCap, Activity, Wind, MousePointer2, Lightbulb
+        } from 'lucide-react';
 
-        // --- 1. ÍCONES SVG ---
-        const Icon = ({ path, size = 24, className = "", color = "currentColor", ...props }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
-                {path}
-            </svg>
-        );
+        // ==========================================
+        // DADOS GLOBAIS
+        // ==========================================
 
-        const Icons = {
-            ArrowRight: (p) => <Icon {...p} path={<path d="M5 12h14M12 5l7 7-7 7"/>} />,
-            ArrowLeft: (p) => <Icon {...p} path={<path d="M19 12H5M12 19l-7-7 7-7"/>} />,
-            ArrowDown: (p) => <Icon {...p} path={<path d="M12 5v14M19 12l-7 7-7-7"/>} />, // Adicionado ArrowDown
-            Zap: (p) => <Icon {...p} path={<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>} />,
-            Magnet: (p) => <Icon {...p} path={<path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.2 2.2 0 0 0-3.1-3.13l-.1.1L6 15z"/>} />,
-            Rotate: (p) => <Icon {...p} path={<><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></>} />,
-            Bulb: (p) => <Icon {...p} path={<><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>} />,
-            Info: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></>} />,
-            List: (p) => <Icon {...p} path={<><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>} />,
-            Atom: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></>} />,
-            Wifi: (p) => <Icon {...p} path={<><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></>} />,
-            CreditCard: (p) => <Icon {...p} path={<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>} />,
-            Hand: (p) => <Icon {...p} path={<><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a9 9 0 0 1 3.24-14.22"/></>} />,
-            Check: (p) => <Icon {...p} path={<polyline points="20 6 9 17 4 12"/>} />,
-            Trophy: (p) => <Icon {...p} path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>} />,
-            City: (p) => <Icon {...p} path={<><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M13 21V11"/><path d="M17 21v-8"/><path d="M9 21v-8"/></>} />, 
-            Activity: (p) => <Icon {...p} path={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>} />,
-            Flame: (p) => <Icon {...p} path={<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-2.246-3.726-2.246-6.572C7.754 5.27 8.243 8.358 11.026 12c.323.513.684.975 1.078 1.365a2.5 2.5 0 0 0 2.896 2.896c.703-.703.228-2.618-.93-3.076a7.71 7.71 0 0 1-1.742-1.28c-.767-.84-1.328-1.96-1.328-3.134 0-2.476 1.944-4.502 4.148-4.49C15.15 6.47 16 9.16 16 11.2c0 2.29-.86 4.39-2.26 5.95-1.57 1.76-3.9 2.85-6.49 2.85-3.31 0-6-2.69-6-6 0-.8.15-1.55.43-2.25.68.73 1.25 1.57 1.82 2.75z"/>} />,
-        };
+        const SLIDES_DATA = [
+          { id: 'cover', title: 'Início' },
+          { id: 'index', title: 'Roteiro' },
+          { id: 'flux', title: 'Fluxo Magnético' },
+          { id: 'faraday', title: 'Lei de Faraday' },
+          { id: 'lenz', title: 'Lei de Lenz' },
+          { id: 'sim', title: 'Laboratório' },
+          { id: 'app', title: 'Aplicações' },
+          { id: 'quiz', title: 'Quiz' },
+          { id: 'refs', title: 'Fontes' },
+          { id: 'end', title: 'Conclusão' }
+        ];
 
-        // --- 2. HOOKS ---
-        const useSwipe = ({ onSwipeLeft, onSwipeRight }) => {
-            const touchCoords = useRef({ x: 0, y: 0 });
-            const onTouchStart = (e) => { touchCoords.current = { x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY }; };
-            const onTouchEnd = (e) => {
-                const deltaX = touchCoords.current.x - e.changedTouches[0].clientX;
-                const deltaY = touchCoords.current.y - e.changedTouches[0].clientY;
-                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                    deltaX > 0 ? onSwipeLeft && onSwipeLeft() : onSwipeRight && onSwipeRight();
-                }
+        // ==========================================
+        // UTILITÁRIOS (Engine Gráfica)
+        // ==========================================
+
+        const useTicker = (callback, active = true) => {
+          const savedCallback = useRef(callback);
+          useEffect(() => { savedCallback.current = callback; }, [callback]);
+
+          useEffect(() => {
+            if (!active) return;
+            let id;
+            let prevTime;
+            const tick = (time) => {
+              if (prevTime !== undefined) {
+                const delta = time - prevTime;
+                savedCallback.current(delta);
+              }
+              prevTime = time;
+              id = requestAnimationFrame(tick);
             };
-            return { onTouchStart, onTouchEnd };
+            id = requestAnimationFrame(tick);
+            return () => cancelAnimationFrame(id);
+          }, [active]);
         };
 
-        // --- 3. COMPONENTES UI ---
-        const InfoBox = ({ title, children, type = "info" }) => {
-            const colors = type === "game" ? "border-yellow-500" : type === "exp" ? "border-purple-500" : "border-cyan-500";
-            const iconColor = type === "game" ? "text-yellow-400" : type === "exp" ? "text-purple-400" : "text-cyan-400";
-            const IconComp = type === "game" ? Icons.Trophy : type === "exp" ? Icons.Zap : Icons.Info;
-            
-            return (
-                <div className={`glass p-5 rounded-xl border-l-4 ${colors} max-w-3xl mx-auto my-4 relative overflow-hidden shadow-2xl animate-fade-in`}>
-                    <div className={`absolute top-0 right-0 p-4 opacity-5 ${iconColor}`}>
-                        <IconComp size={80} />
-                    </div>
-                    {title && <h4 className={`${iconColor} font-bold text-sm uppercase tracking-widest mb-2 flex items-center gap-2`}>
-                        <IconComp size={16}/> {title}
-                    </h4>}
-                    <div className="text-slate-200 text-base leading-relaxed relative z-10">
-                        {children}
-                    </div>
-                </div>
-            );
+        const pulse = (ms = 10) => {
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(ms);
+          }
         };
 
-        const NavButton = ({ onClick, disabled, icon: Icon, label }) => (
-            <button onClick={onClick} disabled={disabled}
-                className={`group p-3 rounded-full transition-all duration-300 flex items-center justify-center border
-                    ${disabled ? 'bg-slate-800/50 border-slate-800 text-slate-600 cursor-not-allowed' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-cyan-900/40 hover:border-cyan-500 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] active:scale-95'}`}
-                aria-label={label}
+        // ==========================================
+        // COMPONENTES UI
+        // ==========================================
+
+        const Glass = memo(({ children, className = "", onClick, hover = false, glow = false }) => (
+          <div 
+            onClick={onClick}
+            className={`
+              relative overflow-hidden backdrop-blur-xl bg-slate-900/50 rounded-2xl border border-white/10 shadow-2xl
+              ${hover ? 'transition-all duration-300 hover:bg-slate-800/60 hover:border-cyan-500/40 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(6,182,212,0.2)] cursor-pointer' : ''}
+              ${glow ? 'shadow-[0_0_30px_-5px_rgba(6,182,212,0.15)]' : ''}
+              ${className}
+            `}
+          >
+            <div className="absolute inset-0 opacity-[0.04] pointer-events-none z-0 mix-blend-overlay" 
+                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} 
+            />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/40 to-transparent"></div>
+            <div className="relative z-10 h-full">{children}</div>
+          </div>
+        ));
+
+        const NeoButton = memo(({ children, onClick, active = false, disabled = false, color = "cyan", className = "" }) => {
+          const styles = {
+            cyan: active 
+              ? "bg-cyan-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.5)] border-cyan-400" 
+              : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border-white/10 hover:border-cyan-500/30",
+            ghost: "bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border-transparent",
+          };
+          return (
+            <button 
+              onClick={onClick} disabled={disabled}
+              className={`px-6 py-3 rounded-xl font-bold border transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${styles[color] || styles.cyan} ${className}`}
             >
-                <Icon size={22} className="group-hover:scale-110 transition-transform" />
+              {children}
             </button>
-        );
+          );
+        });
 
-        // --- 4. SLIDES ---
+        const Badge = ({ text, color = "cyan" }) => {
+          const style = color === 'amber' ? "text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_10px_rgba(245,158,11,0.1)]" : "text-cyan-400 border-cyan-500/30 bg-cyan-500/10 shadow-[0_0_10px_rgba(6,182,212,0.1)]";
+          return <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${style}`}>{text}</span>;
+        };
 
-        const SlideIntro = ({ start }) => (
-            <div className="flex flex-col items-center justify-center h-full text-center px-6 animate-fade-in relative z-10">
-                <div className="mb-8 relative group cursor-pointer animate-float" onClick={start}>
-                    <div className="absolute inset-0 bg-cyan-500 blur-[100px] opacity-20 rounded-full group-hover:opacity-30 transition-opacity duration-500"></div>
-                    <Icons.Atom size={120} className="text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.6)] relative z-10" />
+        // ==========================================
+        // SLIDES
+        // ==========================================
+
+        const CoverSlide = ({ onNext }) => (
+          <div className="flex flex-col items-center justify-center h-full text-center animate-in zoom-in duration-1000 p-4 relative z-10">
+            <div className="relative w-64 h-64 mb-8 group perspective-1000">
+              <div className="absolute inset-0 bg-cyan-500 rounded-full blur-[100px] opacity-30 animate-pulse"></div>
+              <div className="relative z-10 animate-[float_6s_ease-in-out_infinite] transform-style-3d group-hover:rotate-y-180 transition-transform duration-1000">
+                <Magnet size={160} className="text-white drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] mx-auto" />
+                <div className="absolute -top-4 -right-4 animate-bounce">
+                   <div className="relative">
+                     <div className="absolute inset-0 bg-amber-400 blur-lg opacity-50"></div>
+                     <Zap size={56} className="text-amber-400 fill-amber-400 relative z-10" />
+                   </div>
                 </div>
-                
-                <h1 className="text-4xl md:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-2xl neon-text">
-                    Física Interativa
-                </h1>
-                <h2 className="text-xl md:text-3xl font-light text-cyan-200 mb-10 tracking-wide">
-                    A Magia da <span className="font-bold text-cyan-400">Indução Eletromagnética</span>
-                </h2>
-
-                <button onClick={start} 
-                    className="px-10 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-full font-bold tracking-wide transition-all shadow-[0_0_30px_rgba(8,145,178,0.4)] hover:shadow-[0_0_50px_rgba(8,145,178,0.6)] flex items-center gap-3 transform hover:-translate-y-1">
-                    INICIAR EXPERIÊNCIA <Icons.ArrowRight size={24} />
-                </button>
-                
-                <div className="absolute bottom-8 text-center opacity-60">
-                    <p className="text-xs uppercase tracking-widest text-slate-500 mb-1">Apresentado por</p>
-                    <div className="glass px-4 py-2 rounded-lg inline-block">
-                        <p className="text-sm font-bold text-slate-300">Rodrigo Rondon & Lucas Felner</p>
-                        <p className="text-xs text-cyan-500 font-mono">Turma M2C</p>
-                    </div>
-                </div>
+              </div>
             </div>
+            <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 drop-shadow-lg">
+              FÍSICA
+            </h1>
+            <div className="flex items-center gap-4 mb-12">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-cyan-500"></div>
+              <span className="text-cyan-400 font-mono text-sm tracking-[0.3em] uppercase font-bold text-glow">Eletromagnetismo</span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-cyan-500"></div>
+            </div>
+            <NeoButton onClick={onNext} active className="text-lg px-10 py-4">
+              Iniciar <ArrowRight size={20} />
+            </NeoButton>
+          </div>
         );
 
-        const SlideIndex = ({ goTo }) => {
-            const topics = [
-                { id: 2, title: "Campo Magnético", desc: "A força invisível dos ímãs.", icon: Icons.Magnet },
-                { id: 3, title: "Fluxo Magnético", desc: "Capturando linhas de campo.", icon: Icons.Rotate },
-                { id: 4, title: "Lei de Faraday", desc: "Movimento gerando voltagem.", icon: Icons.Zap },
-                { id: 5, title: "Lei de Lenz", desc: "Experimento: Queda Livre.", icon: Icons.ArrowDown },
-                { id: 6, title: "Gerador AC", desc: "Energia em escala industrial.", icon: Icons.Atom },
-                { id: 7, title: "Desafio da Cidade", desc: "Minigame: Controle a rede!", icon: Icons.Trophy },
-                { id: 8, title: "Conclusão", desc: "Aplicações e resumo.", icon: Icons.Check }
-            ];
+        const FluxSlide = () => {
+          const [angle, setAngle] = useState(0);
+          const flux = Math.abs(Math.cos(angle * (Math.PI / 180)));
+          const percent = Math.round(flux * 100);
 
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4 animate-fade-in w-full max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
-                        <Icons.List className="text-cyan-400" /> Índice de Experimentos
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        {topics.map((topic, idx) => (
-                            <button key={idx} onClick={() => goTo(topic.id)}
-                                className="glass p-4 rounded-xl text-left hover:bg-slate-800/90 transition-all hover:border-cyan-500/50 group border border-transparent relative overflow-hidden hover:-translate-y-1">
-                                <div className="absolute right-0 top-0 p-2 opacity-5 text-white group-hover:opacity-10 group-hover:scale-110 transition-all"><topic.icon size={48} /></div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xs font-bold font-mono text-slate-900 bg-cyan-400 px-2 py-0.5 rounded shadow-sm">0{idx + 1}</span>
-                                </div>
-                                <h3 className="text-base font-bold text-slate-200 group-hover:text-cyan-400 transition-colors mb-1">{topic.title}</h3>
-                                <p className="text-xs text-slate-400 relative z-10 leading-snug">{topic.desc}</p>
-                            </button>
-                        ))}
-                    </div>
+          return (
+            <div className="flex flex-col lg:flex-row h-full items-center justify-center gap-12 w-full max-w-6xl mx-auto">
+              <div className="relative w-72 h-72 lg:w-96 lg:h-96 shrink-0 perspective-1000">
+                <div className="absolute inset-0 rounded-full border border-slate-700 bg-slate-900/50 flex items-center justify-center overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]">
+                   <div className="absolute inset-0 flex flex-col justify-evenly opacity-30">
+                     {[...Array(9)].map((_,i) => (
+                       <div key={i} className="w-full h-[1px] bg-cyan-400 shadow-[0_0_8px_cyan] relative overflow-hidden">
+                         <div className="absolute inset-0 bg-white/50 w-1/2 animate-[shimmer_2s_linear_infinite]"></div>
+                       </div>
+                     ))}
+                   </div>
+                   <div 
+                     className="w-56 h-56 rounded-full border-[8px] border-amber-500 bg-amber-500/5 shadow-[0_0_50px_rgba(245,158,11,0.3)] transition-transform duration-200 ease-out flex items-center justify-center"
+                     style={{ transform: `rotateY(${angle}deg)` }}
+                   >
+                     <div className="absolute inset-0 bg-amber-500/10 rounded-full"></div>
+                     <div className="w-32 h-1 bg-red-500 origin-left absolute top-1/2 left-1/2 flex items-center justify-end" style={{ transform: 'translateZ(20px) translateY(-50%)' }}>
+                        <div className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-lg transform rotate-90 origin-bottom">NORMAL</div>
+                     </div>
+                   </div>
                 </div>
-            );
+                <div className="absolute bottom-4 w-full text-center text-[10px] text-slate-500 uppercase font-bold tracking-widest">Visualização 3D</div>
+              </div>
+
+              <Glass className="w-full max-w-md p-8 space-y-8">
+                <div className="text-center">
+                   <div className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Fluxo Magnético Total</div>
+                   <div className={`text-7xl font-mono font-bold transition-colors drop-shadow-lg ${percent > 80 ? 'text-green-400' : percent < 10 ? 'text-red-500' : 'text-amber-400'}`}>
+                     {percent}<span className="text-2xl text-white/50">%</span>
+                   </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-xs text-slate-400 mb-3 font-bold uppercase">
+                    <span>Rotação</span><span className="text-cyan-400">{angle}°</span>
+                  </div>
+                  <input 
+                    type="range" min="0" max="180" value={angle} onChange={(e) => setAngle(Number(e.target.value))}
+                    className="w-full h-2 bg-slate-800 rounded-full appearance-none cursor-ew-resize accent-cyan-500 hover:accent-cyan-400 transition-all"
+                  />
+                  <p className="text-xs text-slate-500 mt-4 italic leading-relaxed border-l-2 border-cyan-500/30 pl-3">
+                    Imagine uma janela aberta ao vento. Se a janela estiver de frente (0°), o vento passa todo. Se estiver de lado (90°), nada passa. Isso é o Fluxo.
+                  </p>
+                </div>
+              </Glass>
+            </div>
+          );
         };
 
-        const SlideField = () => {
-            const [angle, setAngle] = useState(0);
-            const containerRef = useRef(null);
+        const FormulaSlide = () => {
+          const [hover, setHover] = useState(null);
+          const INFO = {
+            e: { t: "Força Eletromotriz (FEM)", d: "A 'voltagem' gerada pelo movimento.", c: "text-amber-400" },
+            l: { t: "Lei de Lenz", d: "A corrente sempre luta contra a mudança (inércia).", c: "text-red-400" },
+            n: { t: "Número de Espiras", d: "Multiplicador de potência. Mais voltas = Mais energia.", c: "text-purple-400" },
+            f: { t: "Variação de Fluxo", d: "A mudança no campo magnético.", c: "text-cyan-400" },
+            t: { t: "Tempo", d: "A rapidez. Quanto mais rápido, maior o choque.", c: "text-green-400" }
+          };
+          const active = hover ? INFO[hover] : null;
 
-            const handleMove = (e) => {
-                if (!containerRef.current) return;
-                const rect = containerRef.current.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                const rad = Math.atan2(clientY - centerY, clientX - centerX);
-                setAngle(rad * (180 / Math.PI) + 90);
-            };
-
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4" ref={containerRef} onMouseMove={handleMove} onTouchMove={handleMove}>
-                    <h2 className="text-3xl font-bold text-white mb-4">1. O Campo Magnético (B)</h2>
-                    <InfoBox title="Aura Invisível">
-                        Todo ímã possui um campo de força invisível. A bússola nada mais é que um pequeno ímã que se alinha a essas linhas de força.
-                        <br/><span className="text-yellow-400 text-sm font-bold mt-2 block animate-pulse flex items-center gap-2"><Icons.Hand size={16}/> Interaja: Passe o mouse/dedo ao redor do ímã!</span>
-                    </InfoBox>
-                    <div className="relative w-full max-w-md h-80 flex items-center justify-center my-4">
-                        <div className="absolute w-64 h-24 rounded-xl flex overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-10 border border-slate-500/30">
-                            <div className="w-1/2 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center font-black text-4xl text-white/90 shadow-inner">N</div>
-                            <div className="w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center font-black text-4xl text-white/90 shadow-inner">S</div>
-                        </div>
-                        <div className="absolute inset-0 opacity-10 pointer-events-none">
-                            {[0, 180].map(deg => (<div key={deg} className="absolute w-full h-full border-2 border-cyan-400 rounded-full transform scale-x-150 scale-y-150 animate-pulse" style={{transform: `rotate(${deg}deg)`, animationDuration: '4s'}} />))}
-                        </div>
-                        <div className="absolute w-20 h-20 bg-slate-900 border-2 border-slate-400 rounded-full flex items-center justify-center shadow-2xl z-20 transition-transform duration-75 ring-4 ring-slate-900/50"
-                             style={{ transform: `translateY(-160px) rotate(${angle}deg)` }}>
-                            <div className="w-4 h-16 relative">
-                                <div className="absolute top-0 w-full h-1/2 bg-red-500 rounded-t-full shadow-[0_0_15px_red]"></div>
-                                <div className="absolute bottom-0 w-full h-1/2 bg-white rounded-b-full"></div>
-                            </div>
-                        </div>
-                    </div>
+          return (
+            <div className="flex flex-col items-center justify-center h-full gap-12 w-full max-w-5xl mx-auto">
+              <Glass className="p-12 w-full text-center relative overflow-hidden group">
+                <div className="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-5 group-hover:animate-[shimmer_2s_infinite]" />
+                
+                <div className="text-5xl md:text-7xl font-mono font-bold flex flex-wrap items-center justify-center gap-4 select-none relative z-10">
+                  <span onMouseEnter={()=>setHover('e')} className="hover:text-amber-400 cursor-help transition-all hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">ε</span>
+                  <span className="text-slate-600">=</span>
+                  <span onMouseEnter={()=>setHover('l')} className="hover:text-red-400 cursor-help transition-all hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(248,113,113,0.5)]">-</span>
+                  <span onMouseEnter={()=>setHover('n')} className="hover:text-purple-400 cursor-help transition-all hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]">N</span>
+                  <span className="text-slate-500 text-3xl">×</span>
+                  <div className="flex flex-col items-center leading-none scale-90">
+                     <span onMouseEnter={()=>setHover('f')} className="border-b-2 border-slate-600 hover:text-cyan-400 cursor-help transition-colors hover:border-cyan-400">ΔΦ</span>
+                     <span onMouseEnter={()=>setHover('t')} className="hover:text-green-400 cursor-help transition-colors">Δt</span>
+                  </div>
                 </div>
-            );
+              </Glass>
+
+              <div className="h-32 w-full max-w-xl text-center relative">
+                {active ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center animate-in slide-in-from-bottom-4 fade-in duration-300">
+                    <div className={`w-16 h-16 mb-4 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-lg`}>
+                       <Activity className={active.c} size={32} />
+                    </div>
+                    <h3 className={`text-xl font-bold ${active.c} mb-2`}>{active.t}</h3>
+                    <p className="text-slate-300 text-lg">{active.d}</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full opacity-30">
+                    <MousePointer2 size={32} className="mb-2 animate-bounce" />
+                    <p className="text-sm italic">Explore a fórmula com o cursor</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
         };
 
-        const SlideFlux = () => {
-            const [angle, setAngle] = useState(0);
-            const flux = Math.abs(Math.cos(angle * Math.PI / 180));
+        const SimulationSlide = () => {
+          const [loops, setLoops] = useState(2);
+          const needleRef = useRef(null);
+          const voltTextRef = useRef(null);
+          const sliderRef = useRef(null);
+          const magnetRef = useRef(null);
+          const bulbRef = useRef(null);
+          const bulbGlowRef = useRef(null);
+          const physics = useRef({ pos: 50, prevPos: 50, volts: 0, targetVolts: 0 });
 
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                    <h2 className="text-3xl font-bold text-white mb-4">2. Fluxo Magnético (Φ)</h2>
-                    <InfoBox title="Capturando o Campo">
-                        Fluxo é quantas linhas de campo conseguem <strong>atravessar</strong> uma área.
-                        Se a espira estiver de lado (90°), o fluxo é zero. De frente (0°), é máximo.
-                    </InfoBox>
-                    <div className="flex flex-col md:flex-row items-center gap-12 w-full max-w-5xl mt-4">
-                        <div className="relative w-full md:w-2/3 h-72 bg-slate-900/50 rounded-2xl border border-slate-700 flex items-center justify-center perspective-1000 overflow-hidden shadow-inner group">
-                            <div className="absolute inset-0 flex justify-around items-center opacity-20 pointer-events-none px-16">
-                                {[...Array(9)].map((_, i) => (<div key={i} className="w-0.5 h-full bg-cyan-400 shadow-[0_0_8px_cyan]"></div>))}
-                            </div>
-                            <div className="w-48 h-48 border-[6px] border-orange-500 bg-orange-500/10 transition-transform duration-100 ease-out shadow-[0_0_40px_rgba(249,115,22,0.3)] relative z-10 backdrop-blur-sm"
-                                 style={{ transform: `rotateY(${angle}deg)` }}>
-                                <div className="absolute inset-0 bg-white/5" style={{opacity: flux}}></div>
-                            </div>
-                            <p className="absolute bottom-4 right-4 text-xs text-slate-500 font-mono border border-slate-700 px-3 py-1 rounded">Vista Lateral</p>
-                        </div>
-                        <div className="w-full md:w-1/3 flex flex-col gap-6">
-                            <div>
-                                <label className="flex justify-between text-sm font-bold text-slate-300 mb-3">
-                                    <span>Ângulo da Espira</span> <span className="text-cyan-400 font-mono">{angle}°</span>
-                                </label>
-                                <input type="range" min="0" max="90" value={angle} onChange={(e) => setAngle(Number(e.target.value))} className="w-full"/>
-                            </div>
-                            <div className="glass p-6 rounded-xl text-center border-t-2 border-t-cyan-500">
-                                <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">Eficiência de Captura</p>
-                                <p className="text-4xl font-mono font-black text-white transition-opacity duration-200 mb-2" style={{ opacity: Math.max(0.3, flux) }}>{(flux * 100).toFixed(0)}%</p>
-                                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-200" style={{width: `${flux*100}%`}}></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+          useTicker(() => {
+            const state = physics.current;
+            if (sliderRef.current) state.pos = parseInt(sliderRef.current.value);
 
-        const SlideFaraday = () => {
-            const [pos, setPos] = useState(0);
-            const [voltage, setVoltage] = useState(0);
-            const [history, setHistory] = useState(new Array(50).fill(0));
-            const lastPos = useRef(0);
-            const timeoutRef = useRef(null);
-
-            // Loop de atualização do gráfico
-            useEffect(() => {
-                const interval = setInterval(() => {
-                    setHistory(prev => [...prev.slice(1), voltage]);
-                }, 50);
-                return () => clearInterval(interval);
-            }, [voltage]);
-
-            const handleDrag = (e) => {
-                const val = Number(e.target.value);
-                const velocity = val - lastPos.current;
-                setVoltage(velocity * 5); 
-                lastPos.current = val;
-                setPos(val);
-                if (timeoutRef.current) clearTimeout(timeoutRef.current);
-                timeoutRef.current = setTimeout(() => setVoltage(0), 100);
-            };
-
-            const absVoltage = Math.abs(voltage);
-            const brightness = Math.min(absVoltage * 5, 100);
-
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                    <h2 className="text-3xl font-bold text-white mb-2">3. Lei de Faraday e Lenz</h2>
-                    <InfoBox title="O Segredo: Variação">
-                        A energia surge apenas quando há <strong>MOVIMENTO</strong> (variação do fluxo). 
-                        Observe o gráfico: Se você parar, a voltagem morre. Mova rápido para picos altos!
-                    </InfoBox>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-6xl mt-2">
-                        {/* Lado Esquerdo: Setup Físico */}
-                        <div className="flex flex-col gap-4">
-                            <div className="relative h-64 bg-slate-900 rounded-xl border border-slate-700 flex items-center justify-center overflow-hidden shadow-2xl">
-                                {/* Lâmpada */}
-                                <div className="absolute top-4 right-6 flex flex-col items-center z-20">
-                                    <div className="relative">
-                                        <Icons.Bulb size={64} className={`transition-colors duration-100 ${brightness > 10 ? 'text-yellow-300' : 'text-slate-600'}`} />
-                                        <div className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl transition-opacity duration-100 pointer-events-none" style={{ opacity: brightness / 100 }}></div>
-                                    </div>
-                                </div>
-                                {/* Bobina */}
-                                <div className="w-48 h-40 border-[8px] border-orange-700 rounded-xl absolute left-8 flex items-center justify-center z-10 bg-black/30 shadow-inner">
-                                    {[1,2,3,4].map(i => (<div key={i} className="absolute w-full h-3 bg-gradient-to-r from-orange-600 via-yellow-700 to-orange-600 shadow-lg rounded-full" style={{top: `${i * 20}%`}}></div>))}
-                                </div>
-                                {/* Ímã */}
-                                <div className="w-40 h-16 flex rounded shadow-xl transition-transform duration-75 z-20 relative border border-white/10"
-                                    style={{ transform: `translateX(${(pos - 50) * 4}px)` }}>
-                                    <div className="w-1/2 bg-red-600 flex items-center justify-center text-white font-black text-xl">N</div>
-                                    <div className="w-1/2 bg-blue-600 flex items-center justify-center text-white font-black text-xl">S</div>
-                                </div>
-                            </div>
-                            
-                            <div className="glass p-4 rounded-xl">
-                                <div className="flex justify-between text-xs font-bold uppercase text-slate-400 mb-2">
-                                    <span>Lento</span> <span className="text-cyan-400 animate-pulse">Arraste o Ímã</span> <span>Rápido</span>
-                                </div>
-                                <input type="range" min="0" max="100" value={pos} onChange={handleDrag} className="w-full" />
-                            </div>
-                        </div>
-
-                        {/* Lado Direito: Gráfico em Tempo Real */}
-                        <div className="bg-slate-950 rounded-xl border border-slate-800 p-4 flex flex-col relative overflow-hidden">
-                            <div className="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
-                                <span className="text-xs font-mono text-cyan-500">OSCILOSCÓPIO V1.0</span>
-                                <span className="text-xl font-mono font-bold text-white">{voltage.toFixed(0)} mV</span>
-                            </div>
-                            <div className="flex-1 relative flex items-center">
-                                <div className="absolute w-full h-px bg-slate-800"></div>
-                                <div className="w-full h-32 flex items-end gap-1">
-                                    {history.map((val, i) => (
-                                        <div key={i} className="flex-1 bg-cyan-500/50 rounded-full transition-all duration-75" 
-                                             style={{ 
-                                                 height: `${Math.abs(val) * 1.5}px`, 
-                                                 transform: `translateY(${val > 0 ? '-50%' : '50%'}) scaleY(${val === 0 ? 0 : 1})`,
-                                                 opacity: (i / 50) 
-                                             }}>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <p className="text-xs text-slate-500 mt-2 text-center">Histórico de Voltagem (Tempo)</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // SLIDE 6: EXPERIMENTO DE LENZ (NOVO)
-        const SlideLenz = () => {
-            const [drop, setDrop] = useState(false);
-            const [tube, setTube] = useState('plastic'); // plastic | copper
-
-            const dropTime = tube === 'plastic' ? '0.5s' : '3s';
-
-            const reset = () => {
-                setDrop(false);
-                setTimeout(() => setDrop(true), 100);
-            };
-
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">4. Lei de Lenz (O Freio Magnético)</h2>
-                    <InfoBox type="exp" title="Experimento Prático">
-                        A natureza resiste à mudança. Quando o ímã cai no tubo de cobre, ele induz uma corrente que cria um campo magnético <strong>OPOSTO</strong>, freando a queda.
-                        No plástico, não há corrente, então ele cai livremente.
-                    </InfoBox>
-
-                    <div className="flex gap-16 items-end h-96 mt-8">
-                        {/* Tubo */}
-                        <div className={`w-24 h-full rounded-lg border-4 relative overflow-hidden transition-colors duration-500 ${tube === 'copper' ? 'bg-gradient-to-r from-orange-700 to-orange-500 border-orange-900' : 'bg-slate-800/30 border-slate-600'}`}>
-                            {/* Ímã caindo */}
-                            <div className={`absolute left-1/2 -translate-x-1/2 w-12 h-8 bg-gradient-to-b from-red-600 to-blue-600 rounded shadow-lg z-10
-                                            ${drop ? 'top-[90%]' : 'top-2'}`}
-                                 style={{ transition: drop ? `top ${dropTime} linear` : 'none' }}>
-                            </div>
-                            {/* Visualização das Correntes de Foucault (Eddy Currents) */}
-                            {tube === 'copper' && drop && (
-                                <div className="absolute inset-0 animate-pulse opacity-50">
-                                    <div className="absolute top-[40%] w-full h-1 bg-white blur-md"></div>
-                                    <div className="absolute top-[60%] w-full h-1 bg-white blur-md"></div>
-                                </div>
-                            )}
-                            <p className="absolute bottom-2 w-full text-center text-xs font-bold text-white/50 uppercase">{tube === 'copper' ? 'Cobre' : 'Plástico'}</p>
-                        </div>
-
-                        {/* Controles */}
-                        <div className="flex flex-col gap-4 mb-10">
-                            <button onClick={() => setTube('plastic')} className={`px-6 py-3 rounded-lg font-bold transition-all ${tube === 'plastic' ? 'bg-slate-600 text-white ring-2 ring-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-                                Tubo de Plástico
-                            </button>
-                            <button onClick={() => setTube('copper')} className={`px-6 py-3 rounded-lg font-bold transition-all ${tube === 'copper' ? 'bg-orange-600 text-white ring-2 ring-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-                                Tubo de Cobre
-                            </button>
-                            <button onClick={reset} className="mt-4 px-6 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full font-black tracking-wider shadow-lg transform active:scale-95 transition-all">
-                                SOLTAR ÍMÃ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // SLIDE 7: GERADOR AC
-        const SlideGenerator = () => {
-            const [rpm, setRpm] = useState(0);
-            const [rotation, setRotation] = useState(0);
-            const [points, setPoints] = useState([]); 
+            const delta = state.pos - state.prevPos;
+            const inZone = state.pos > 25 && state.pos < 75;
             
-            useEffect(() => {
-                if (rpm === 0) return;
-                let animFrame;
-                const animate = () => {
-                    setRotation(r => (r + rpm * 0.5) % 360);
-                    setPoints(old => {
-                        const now = Date.now() / 1000;
-                        const val = Math.sin(now * rpm * 0.5) * rpm * 4; 
-                        const newArr = [...old, val];
-                        if (newArr.length > 100) newArr.shift();
-                        return newArr;
-                    });
-                    animFrame = requestAnimationFrame(animate);
-                };
-                animFrame = requestAnimationFrame(animate);
-                return () => cancelAnimationFrame(animFrame);
-            }, [rpm]);
+            if (inZone && Math.abs(delta) > 0.1) {
+              state.targetVolts = delta * 4 * loops;
+              pulse(5);
+            } else {
+              state.targetVolts = 0;
+            }
 
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">5. O Gerador AC</h2>
-                    <InfoBox>
-                        Automatizando a Indução: Uma turbina gira a bobina constantemente dentro de um campo magnético. Isso cria uma onda senoidal de energia (Corrente Alternada).
-                    </InfoBox>
-                    <div className="flex flex-col lg:flex-row items-center justify-center gap-10 w-full max-w-6xl mt-4">
-                        <div className="relative w-64 h-64 bg-slate-900 rounded-full border-[6px] border-slate-700 flex items-center justify-center overflow-hidden shadow-2xl">
-                            <div className="absolute left-0 w-8 h-full bg-red-700 opacity-90 flex items-center justify-center text-white font-bold">N</div>
-                            <div className="absolute right-0 w-8 h-full bg-blue-700 opacity-90 flex items-center justify-center text-white font-bold">S</div>
-                            <div className="w-40 h-12 bg-gradient-to-b from-yellow-600 to-yellow-400 border border-yellow-200 relative z-10 shadow-lg"
-                                 style={{ transform: `rotate(${rotation}deg)` }}>
-                                <div className="absolute inset-0 flex items-center justify-center"><div className="w-2 h-2 bg-black rounded-full opacity-50"></div></div>
-                            </div>
-                        </div>
-                        <div className="w-80 h-40 bg-black border-2 border-slate-600 rounded-lg relative overflow-hidden shadow-[0_0_20px_rgba(0,255,0,0.2)]">
-                            <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 opacity-20 pointer-events-none">
-                                {[...Array(24)].map((_,i) => <div key={i} className="border border-green-500"></div>)}
-                            </div>
-                            <div className="absolute inset-0 flex items-center px-2">
-                                <svg className="w-full h-full overflow-visible">
-                                    <polyline fill="none" stroke="#4ade80" strokeWidth="2"
-                                        points={points.map((y, i) => `${i * 3},${80 - y}`).join(' ')}
-                                        className="drop-shadow-[0_0_5px_#4ade80]" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div className="glass p-5 rounded-xl w-64 text-center">
-                            <label className="text-xs font-bold text-slate-300 block mb-2 uppercase tracking-wider">Acelerar Turbina</label>
-                            <input type="range" min="0" max="10" step="1" value={rpm} onChange={e => setRpm(Number(e.target.value))} className="w-full mb-2" />
-                            <p className="text-xs font-mono text-cyan-400 mt-2">{rpm === 0 ? "DESLIGADO" : `${rpm * 600} RPM`}</p>
-                        </div>
-                    </div>
+            state.volts += (state.targetVolts - state.volts) * 0.15;
+            state.prevPos = state.pos;
+
+            if (needleRef.current) {
+              const angle = Math.max(-70, Math.min(70, state.volts * 2.5));
+              needleRef.current.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            }
+            if (magnetRef.current) magnetRef.current.style.left = `${state.pos}%`;
+
+            if (voltTextRef.current) {
+              const v = state.volts;
+              if (Math.abs(v) > 0.5) {
+                 voltTextRef.current.textContent = `${v.toFixed(0)} mV`;
+                 voltTextRef.current.style.color = v > 0 ? '#22d3ee' : '#f87171';
+              } else {
+                 voltTextRef.current.textContent = "0 mV";
+                 voltTextRef.current.style.color = '#64748b';
+              }
+            }
+
+            if (bulbRef.current && bulbGlowRef.current) {
+              const brightness = Math.min(Math.abs(state.volts) / 15, 1); 
+              const color = state.volts > 0 ? '0, 255, 255' : '255, 50, 50'; 
+              bulbRef.current.style.opacity = 0.2 + (brightness * 0.8);
+              bulbRef.current.style.color = `rgb(${color})`;
+              bulbGlowRef.current.style.opacity = brightness;
+              bulbGlowRef.current.style.background = `radial-gradient(circle, rgba(${color}, 0.6) 0%, transparent 70%)`;
+            }
+          });
+
+          return (
+            <div className="flex flex-col h-full items-center justify-center gap-8 w-full max-w-6xl mx-auto">
+              <div className="flex flex-col md:flex-row gap-12 items-center justify-center w-full">
+                <div className="relative w-64 h-64 shrink-0 bg-slate-800 rounded-full border-8 border-slate-700 shadow-2xl flex items-center justify-center">
+                   <div className="absolute inset-2 bg-slate-950 rounded-full shadow-inner"></div>
+                   <div className="absolute top-16 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
+                      <div ref={bulbGlowRef} className="absolute inset-[-20px] rounded-full pointer-events-none transition-none opacity-0"></div>
+                      <Lightbulb ref={bulbRef} size={32} className="text-slate-700 transition-none" />
+                   </div>
+                   <div className="absolute w-full text-center bottom-16 text-xs font-mono text-slate-500 flex justify-between px-12"><span>-V</span><span>0</span><span>+V</span></div>
+                   <div ref={needleRef} className="absolute bottom-1/2 left-1/2 w-1.5 h-24 bg-red-500 origin-bottom rounded-full z-10 shadow-md will-change-transform" style={{ transform: 'translateX(-50%) rotate(0deg)' }}></div>
+                   <div className="absolute w-6 h-6 bg-slate-200 rounded-full z-20 shadow-lg border-2 border-slate-400"></div>
+                   <div ref={voltTextRef} className="absolute bottom-10 font-mono text-2xl font-bold text-slate-500 tracking-widest">0 mV</div>
                 </div>
-            );
+
+                <div className="relative w-full max-w-lg h-56 bg-slate-900/80 rounded-3xl border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl backdrop-blur-sm group">
+                   <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .3) 25%, rgba(255, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .3) 75%, rgba(255, 255, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .3) 25%, rgba(255, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .3) 75%, rgba(255, 255, 255, .3) 76%, transparent 77%, transparent)', backgroundSize: '30px 30px' }}></div>
+                   <div className="flex gap-4 z-0 opacity-90 transition-all duration-300">
+                     {[...Array(loops)].map((_, i) => (
+                        <div key={i} className="w-20 h-32 border-[8px] border-amber-600 rounded-3xl bg-gradient-to-r from-amber-900/40 to-amber-600/10 shadow-[0_0_15px_rgba(245,158,11,0.2)] relative">
+                           <div className="absolute inset-0 flex flex-col justify-between py-1 opacity-50">{[...Array(6)].map((_, j) => <div key={j} className="w-full h-1 bg-amber-400/30"></div>)}</div>
+                        </div>
+                     ))}
+                   </div>
+                   <div ref={magnetRef} className="absolute z-10 w-36 h-16 flex shadow-[0_20px_30px_rgba(0,0,0,0.6)] cursor-grab active:cursor-grabbing will-change-transform hover:scale-105 transition-transform duration-75 ease-out" style={{ left: '50%', transform: 'translate(-50%, 0)' }}>
+                     <div className="flex-1 bg-gradient-to-br from-red-500 to-red-700 text-white flex items-center justify-center font-black text-xl rounded-l-xl border-y border-l border-white/20">N</div>
+                     <div className="flex-1 bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 flex items-center justify-center font-black text-xl rounded-r-xl border-y border-r border-white/20">S</div>
+                     <div className="absolute inset-0 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none"></div>
+                   </div>
+                </div>
+              </div>
+
+              <Glass className="w-full max-w-3xl p-6 flex flex-col md:flex-row gap-8 items-end" glow>
+                <div className="w-full">
+                   <div className="flex justify-between text-xs text-slate-400 font-bold uppercase mb-3"><span>Controle do Ímã</span><span className="text-cyan-400 animate-pulse flex items-center gap-1"><Wind size={12}/> Mova Rápido!</span></div>
+                   <input ref={sliderRef} type="range" min="0" max="100" defaultValue="50" className="w-full h-6 bg-slate-800 rounded-full cursor-ew-resize accent-white hover:accent-cyan-400 transition-all appearance-none border border-white/10" />
+                   <div className="flex justify-between text-[10px] text-slate-600 mt-2 font-mono uppercase"><span>Fora</span><span>Centro da Bobina</span><span>Fora</span></div>
+                </div>
+                <div className="w-full md:w-auto shrink-0">
+                   <div className="text-xs text-slate-400 font-bold uppercase mb-2 text-center">Bobinas (N)</div>
+                   <div className="flex bg-slate-800 rounded-xl p-1.5 border border-slate-700 shadow-inner">
+                     {[1, 2, 3].map(n => (
+                       <button key={n} onClick={() => setLoops(n)} className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${loops === n ? 'bg-amber-500 text-black shadow-lg scale-105' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>{n}x</button>
+                     ))}
+                   </div>
+                </div>
+              </Glass>
+            </div>
+          );
         };
 
-        // SLIDE 8: DESAFIO DA CIDADE
-        const SlideChallenge = () => {
-            const [power, setPower] = useState(50);
-            const [target, setTarget] = useState(50);
-            const [score, setScore] = useState(0);
-            const [status, setStatus] = useState("stable");
+        const QuizSlide = () => {
+          const [step, setStep] = useState(0);
+          const [score, setScore] = useState(0);
+          const [status, setStatus] = useState('idle');
 
-            useEffect(() => {
-                let lastTime = Date.now();
-                let intervalId;
-                
-                const gameLoop = () => {
-                    const now = Date.now();
-                    if (Math.random() > 0.98) setTarget(Math.random() * 80 + 10);
-                    
-                    const diff = Math.abs(power - target);
-                    if (diff < 15) {
-                        setScore(s => s + 1);
-                        setStatus("stable");
-                    } else {
-                        setStatus(power > target ? "high" : "low");
-                        setScore(s => Math.max(0, s - 1));
-                    }
-                    
-                    intervalId = requestAnimationFrame(gameLoop);
-                };
-                
-                intervalId = requestAnimationFrame(gameLoop);
-                return () => cancelAnimationFrame(intervalId);
-            }, [power, target]);
+          const QUESTIONS = [
+            { q: "O que é necessário para induzir corrente?", opts: ["Ímã muito forte", "Variação de Fluxo Magnético", "Fio de cobre grosso"], corr: 1, exp: "Sem variação (movimento relativo), não há indução, mesmo com ímãs fortes." },
+            { q: "A Lei de Lenz afirma que a corrente induzida:", opts: ["Aquece o fio", "Acelera o ímã", "Se opõe à variação do fluxo"], corr: 2, exp: "É o princípio de conservação de energia: a natureza resiste à mudança." },
+            { q: "Onde aplicamos a indução no dia a dia?", opts: ["Baterias de Carro", "Carregadores Wireless", "Lâmpadas Incandescentes"], corr: 1, exp: "Carregadores sem fio usam bobinas para transmitir energia via campo magnético." }
+          ];
 
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Desafio: Operador de Usina</h2>
-                    <InfoBox type="game" title="Mantenha a Rede Estável">
-                        Ajuste a produção (Azul) para encontrar a Demanda da Cidade (Amarela).
-                        <br/><span className="text-xs">Pontuação: {score}</span>
-                    </InfoBox>
+          const handleAnswer = (idx) => {
+            const isCorrect = idx === QUESTIONS[step].corr;
+            if (isCorrect) setScore(s => s + 1);
+            setStatus(isCorrect ? 'correct' : 'wrong');
+            pulse(isCorrect ? [50, 50, 50] : 200);
+          };
 
-                    <div className="relative w-full max-w-4xl h-64 bg-slate-900 rounded-xl overflow-hidden border-2 border-slate-700 flex items-end justify-center pb-0">
-                        <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-slate-800 z-0"></div>
-                        {[...Array(10)].map((_, i) => {
-                            const height = 30 + Math.sin(i + Date.now() / 1000) * 20 + (Math.random() * 40);
-                            return (
-                                <div key={i} className="w-12 mx-1 bg-slate-950 z-10 relative flex flex-col-reverse gap-1 p-1 border-t border-x border-slate-800" style={{height: `${40 + i * 5}%`}}>
-                                    {[...Array(5)].map((_, j) => (
-                                        <div key={j} className={`w-full h-2 rounded-sm transition-all duration-500 ${status === "stable" ? 'bg-yellow-400 shadow-[0_0_8px_yellow]' : 'bg-slate-800'}`}></div>
-                                    ))}
-                                </div>
-                            );
-                        })}
-                        {status === "high" && <div className="absolute inset-0 bg-red-500/30 z-20 flex items-center justify-center text-red-500 font-black text-5xl animate-pulse">SOBRECARGA!</div>}
-                        {status === "low" && <div className="absolute inset-0 bg-black/80 z-20 flex items-center justify-center text-slate-500 font-black text-5xl">BLACKOUT</div>}
-                    </div>
+          const next = () => {
+            if (step < QUESTIONS.length - 1) { setStep(s => s + 1); setStatus('idle'); } else { setStatus('end'); }
+          };
 
-                    <div className="w-full max-w-xl mt-6 glass p-6 rounded-xl">
-                        <div className="h-8 bg-slate-800 rounded-full relative mb-4 overflow-hidden border border-slate-600">
-                            <div className="absolute top-0 bottom-0 w-2 bg-yellow-400 z-10 transition-all duration-500 shadow-[0_0_15px_yellow]" style={{left: `${target}%`}}></div>
-                            <div className={`absolute top-0 bottom-0 transition-all duration-75 ${status === "stable" ? "bg-cyan-500" : "bg-red-500"}`} style={{width: `${power}%`}}></div>
-                        </div>
-                        <input type="range" min="0" max="100" value={power} onChange={e => setPower(Number(e.target.value))} className="w-full" />
-                    </div>
-                </div>
-            );
+          if (status === 'end') return (
+            <div className="text-center animate-in zoom-in duration-500">
+              <div className="inline-block p-6 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-2xl mb-6"><GraduationCap size={64} className="text-white" /></div>
+              <h2 className="text-4xl font-bold text-white mb-2">Quiz Finalizado</h2>
+              <p className="text-xl text-slate-300 mb-8">Sua pontuação: <strong className={score === 3 ? "text-green-400" : "text-amber-400"}>{score}</strong> de {QUESTIONS.length}</p>
+              <NeoButton onClick={() => { setStep(0); setScore(0); setStatus('idle'); }}><RefreshCw size={18} /> Tentar Novamente</NeoButton>
+            </div>
+          );
+
+          const q = QUESTIONS[step];
+
+          return (
+            <div className="max-w-xl w-full mx-auto">
+              <div className="flex justify-between items-center mb-8">
+                <Badge text={`Questão ${step + 1} / ${QUESTIONS.length}`} color="amber" />
+                <div className="flex gap-1.5">{QUESTIONS.map((_,i) => <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-amber-500' : 'bg-slate-800'}`}></div>)}</div>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-8 leading-snug">{q.q}</h3>
+              <div className="space-y-4">
+                {q.opts.map((opt, i) => {
+                  let style = "border-white/5 bg-slate-800/40 hover:bg-slate-800 text-slate-300";
+                  if (status !== 'idle') {
+                     if (i === q.corr) style = "border-green-500 bg-green-500/10 text-green-200 ring-1 ring-green-500";
+                     else if (status === 'wrong' && i !== q.corr) style = "opacity-40 border-transparent";
+                  }
+                  return <button key={i} onClick={() => status === 'idle' && handleAnswer(i)} disabled={status !== 'idle'} className={`w-full p-5 rounded-xl text-left border transition-all font-medium flex justify-between items-center ${style}`}>{opt} {status !== 'idle' && i === q.corr && <CheckCircle size={20} className="text-green-400" />}</button>;
+                })}
+              </div>
+              {status !== 'idle' && <div className="mt-8 animate-in slide-in-from-bottom-4 fade-in"><div className={`p-5 rounded-xl mb-4 text-sm border bg-slate-900/90 backdrop-blur-md shadow-lg ${status === 'correct' ? 'border-green-500/30 text-green-100' : 'border-red-500/30 text-red-100'}`}><strong>Explicação:</strong> {q.exp}</div><NeoButton onClick={next} className="w-full" active>Próxima Pergunta <ArrowRight size={18} /></NeoButton></div>}
+            </div>
+          );
         };
 
-        // SLIDE 9: CONCLUSÃO
-        const SlideConclusion = () => {
-            return (
-                <div className="h-full flex flex-col items-center justify-center px-6 text-center no-scrollbar overflow-y-auto">
-                    <h2 className="text-3xl font-bold text-white mb-8 mt-10 md:mt-0">O Legado de Faraday</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mb-10">
-                        {[
-                            { icon: Icons.Wifi, title: "Wireless", text: "Bobinas transferindo energia pelo ar." },
-                            { icon: Icons.Zap, title: "Transformadores", text: "A base da nossa rede elétrica moderna." },
-                            { icon: Icons.CreditCard, title: "NFC", text: "Comunicação de dados por indução magnética." }
-                        ].map((item, i) => (
-                            <div key={i} className="glass p-6 rounded-xl hover:border-cyan-500 transition-all hover:-translate-y-2 group text-left cursor-default border border-slate-700 bg-slate-800/50">
-                                <div className="bg-slate-800 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors shadow-lg">
-                                    <item.icon size={28} />
-                                </div>
-                                <h3 className="font-bold text-lg text-slate-100 mb-2 group-hover:text-cyan-300">{item.title}</h3>
-                                <p className="text-sm text-slate-400 leading-relaxed">{item.text}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="max-w-3xl bg-gradient-to-r from-slate-900 to-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl mb-10">
-                        <h3 className="text-xl font-bold text-cyan-400 mb-2 flex items-center justify-center gap-2"><Icons.List size={20}/> Resumo Final</h3>
-                        <p className="text-slate-300 text-base italic">"A eletricidade moderna não existe sem magnetismo. A Lei de Faraday nos ensinou que a chave para a energia infinita é simples: <strong>manter o campo magnético em movimento</strong>."</p>
-                    </div>
-                </div>
-            );
-        };
+        // ==========================================
+        // APP PRINCIPAL
+        // ==========================================
 
-        // --- APP PRINCIPAL ---
         const App = () => {
-            const [slide, setSlide] = useState(0);
-            const slides = [
-                { comp: SlideIntro, id: 0 }, { comp: SlideIndex, id: 1 }, { comp: SlideField, id: 2 },
-                { comp: SlideFlux, id: 3 }, { comp: SlideFaraday, id: 4 }, { comp: SlideLenz, id: 5 },
-                { comp: SlideGenerator, id: 6 }, { comp: SlideChallenge, id: 7 }, { comp: SlideConclusion, id: 8 }
-            ];
+          const [slide, setSlide] = useState(0);
+          const [menu, setMenu] = useState(false);
 
-            const next = () => setSlide(curr => Math.min(curr + 1, slides.length - 1));
-            const prev = () => setSlide(curr => Math.max(curr - 1, 0));
-            const goTo = (idx) => setSlide(idx);
-            const swipeHandlers = useSwipe({ onSwipeLeft: next, onSwipeRight: prev });
+          const next = () => setSlide(s => Math.min(s + 1, SLIDES_DATA.length - 1));
+          const prev = () => setSlide(s => Math.max(s - 1, 0));
+          const goto = (i) => { setSlide(i); setMenu(false); };
 
-            useEffect(() => {
-                const k = (e) => { if (e.key === 'ArrowRight' || e.key === ' ') next(); if (e.key === 'ArrowLeft') prev(); };
-                window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
-            }, []);
-
-            const CurrentSlide = slides[slide].comp;
-
-            return (
-                <div className="w-full h-full flex flex-col bg-grid relative text-slate-200 tech-bg" {...swipeHandlers}>
-                    <main className="flex-1 relative z-10 overflow-hidden">
-                        <div className="absolute inset-0" key={slide}><CurrentSlide start={() => goTo(1)} goTo={goTo} /></div>
-                    </main>
-                    <footer className="h-20 shrink-0 glass border-t-0 border-t-slate-700 flex items-center justify-between px-4 md:px-8 z-50 safe-area-bottom">
-                        <NavButton onClick={prev} disabled={slide === 0} icon={Icons.ArrowLeft} label="Anterior" />
-                        <div className="flex gap-1.5 md:gap-2">
-                            {slides.map((_, i) => (
-                                <button key={i} onClick={() => goTo(i)} className={`h-1.5 rounded-full transition-all duration-500 ${i === slide ? 'w-8 bg-cyan-400 shadow-[0_0_10px_cyan]' : 'w-2 bg-slate-600 hover:bg-slate-500'}`} aria-label={`Ir para slide ${i + 1}`} />
-                            ))}
-                        </div>
-                        <NavButton onClick={next} disabled={slide === slides.length - 1} icon={Icons.ArrowRight} label="Próximo" />
-                    </footer>
+          const renderContent = () => {
+            switch(SLIDES_DATA[slide].id) {
+              case 'cover': return <CoverSlide onNext={next} />;
+              case 'index': return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
+                  {SLIDES_DATA.slice(1, -1).map((s, i) => (
+                    <Glass key={s.id} hover onClick={() => goto(i + 1)} className="p-6 flex justify-between items-center group border-l-4 border-l-transparent hover:border-l-cyan-500">
+                      <div><span className="text-xs font-bold text-slate-500 uppercase block mb-1">Módulo 0{i + 1}</span><span className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">{s.title}</span></div>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-black transition-all"><ChevronRight size={16} /></div>
+                    </Glass>
+                  ))}
                 </div>
-            );
-        };
+              );
+              case 'flux': return <FluxSlide />;
+              case 'faraday': return <FormulaSlide />;
+              case 'lenz': return (
+                <div className="flex flex-col md:flex-row gap-8 items-center justify-center h-full max-w-5xl mx-auto">
+                  <div className="w-full md:w-1/2 space-y-6">
+                    <div className="bg-red-500/10 border-l-4 border-red-500 p-8 rounded-r-2xl backdrop-blur-sm">
+                       <h3 className="text-2xl font-bold text-white mb-3 flex items-center gap-3"><AlertCircle className="text-red-400" size={28}/> Lei de Lenz</h3>
+                       <p className="text-slate-200 text-lg leading-relaxed">"A corrente induzida tem um sentido que se <strong>opõe</strong> à causa que a produziu."</p>
+                    </div>
+                    <p className="text-slate-400 text-sm border-l border-white/10 pl-4">É a "Inércia Eletromagnética". Sem ela, criaríamos energia do nada, violando as leis da física.</p>
+                  </div>
+                  <div className="w-full md:w-1/2 grid gap-4">
+                     <Glass className="p-6 flex items-center gap-6"><div className="bg-slate-800 p-4 rounded-full shadow-lg"><ArrowRight className="text-cyan-400" size={24}/></div><div><strong className="text-cyan-400 block text-lg">Aproximar Ímã</strong><span className="text-sm text-slate-400">A bobina cria um campo que <strong>EMPURRA</strong> de volta.</span></div></Glass>
+                     <Glass className="p-6 flex items-center gap-6"><div className="bg-slate-800 p-4 rounded-full shadow-lg"><ArrowLeft className="text-amber-400" size={24}/></div><div><strong className="text-amber-400 block text-lg">Afastar Ímã</strong><span className="text-sm text-slate-400">A bobina cria um campo que <strong>PUXA</strong> de volta.</span></div></Glass>
+                  </div>
+                </div>
+              );
+              case 'sim': return <SimulationSlide />;
+              case 'app': return (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
+                  {[
+                    { t: "Usinas", d: "Turbinas gigantes giram ímãs para gerar energia para cidades.", i: Zap, c: "text-cyan-400", b: "border-cyan-500" },
+                    { t: "Transformadores", d: "Alteram a voltagem (110V/220V) usando apenas indução.", i: Layers, c: "text-amber-400", b: "border-amber-500" },
+                    { t: "Indução", d: "Carregadores sem fio e fogões transferem energia pelo ar.", i: Activity, c: "text-purple-400", b: "border-purple-500" }
+                  ].map((x, i) => (
+                    <Glass key={i} hover className={`p-8 text-center border-t-4 ${x.b}`}>
+                      <div className="bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner"><x.i size={32} className={x.c} /></div>
+                      <h4 className="font-bold text-white text-xl mb-3">{x.t}</h4>
+                      <p className="text-slate-400 text-sm leading-relaxed">{x.d}</p>
+                    </Glass>
+                  ))}
+                </div>
+              );
+              case 'quiz': return <QuizSlide />;
+              case 'refs': return (
+                <div className="max-w-2xl w-full space-y-6">
+                   <Glass className="p-8">
+                     <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-white/10 pb-4"><BookOpen className="text-cyan-400"/> Webgrafia</h3>
+                     <div className="space-y-4">
+                       {[ { n: "Khan Academy", u: "Fluxo Magnético e Faraday" }, { n: "Só Física", u: "Eletromagnetismo Teórico" }, { n: "Manual do Mundo", u: "Geradores Caseiros" } ].map((r, i) => (
+                         <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                           <Globe className="text-slate-500 group-hover:text-cyan-400 transition-colors" size={20}/>
+                           <div><strong className="block text-slate-200 group-hover:text-white transition-colors">{r.n}</strong><span className="text-xs text-slate-500 font-mono">{r.u}</span></div>
+                         </div>
+                       ))}
+                     </div>
+                   </Glass>
+                </div>
+              );
+              case 'end': return (
+                <div className="text-center animate-in zoom-in duration-700">
+                   <div className="w-24 h-24 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(6,182,212,0.4)]"><ThumbsUp className="text-white" size={48} /></div>
+                   <h2 className="text-5xl font-black text-white mb-4">Obrigado!</h2>
+                   <p className="text-slate-400 text-lg italic mb-12">"A natureza é nossa professora."</p>
+                   <NeoButton onClick={() => goto(0)} color="ghost"><RefreshCw size={16}/> Reiniciar Apresentação</NeoButton>
+                </div>
+              );
+              default: return null;
+            }
+          };
 
-        createRoot(document.getElementById('root')).render(<App />);
+          return (
+            <div className="fixed inset-0 bg-slate-950 text-slate-100 font-sans overflow-hidden flex flex-col select-none">
+              <div className="absolute inset-0 pointer-events-none z-0">
+                 <div className="absolute top-[-20%] left-[-10%] w-[80vw] h-[80vw] bg-cyan-900/20 rounded-full blur-[120px]"></div>
+                 <div className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] bg-blue-900/10 rounded-full blur-[120px]"></div>
+                 <div className="absolute inset-0 opacity-[0.03] bg-repeat" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }}></div>
+              </div>
+
+              <header className="h-16 shrink-0 z-50 flex justify-between items-center px-6 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
+                <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => goto(0)}>
+                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/20"><Magnet size={18} className="text-white"/></div>
+                   <span className="font-bold tracking-wide text-sm hidden sm:block text-slate-200">FÍSICA</span>
+                </div>
+                <button onClick={() => setMenu(true)} className="p-2 text-slate-300 hover:bg-white/10 rounded-lg transition-colors"><Menu size={24} /></button>
+              </header>
+
+              <main className="flex-grow overflow-y-auto overflow-x-hidden px-4 py-6 relative z-10 custom-scrollbar">
+                 <div className="max-w-6xl mx-auto h-full flex flex-col">
+                    {SLIDES_DATA[slide].id !== 'cover' && SLIDES_DATA[slide].id !== 'end' && (
+                       <div className="mb-8 border-b border-white/5 pb-4 shrink-0 animate-in slide-in-from-left-4 fade-in duration-500 flex items-end gap-4">
+                          <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">{SLIDES_DATA[slide].title}</h2>
+                          <span className="text-xs text-slate-500 font-mono mb-1.5 opacity-50">0{slide}/{SLIDES_DATA.length - 1}</span>
+                       </div>
+                    )}
+                    <div className="flex-grow flex flex-col justify-center items-center w-full animate-in fade-in duration-500">
+                       {renderContent()}
+                    </div>
+                 </div>
+              </main>
+
+              <footer className="h-20 shrink-0 z-50 border-t border-white/5 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center px-6">
+                 <div className="w-full max-w-4xl flex items-center justify-between gap-6">
+                    <button onClick={prev} disabled={slide === 0} className="w-12 h-12 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30 transition-all active:scale-95"><ArrowLeft size={20}/></button>
+                    <div className="flex gap-1.5 overflow-hidden px-2 h-1.5 rounded-full bg-slate-900/50 border border-white/5 p-0.5">
+                       {SLIDES_DATA.map((_, i) => (
+                          <div key={i} className={`h-full rounded-full transition-all duration-500 ease-out ${i === slide ? 'w-8 bg-cyan-500 shadow-[0_0_10px_cyan]' : 'w-1.5 bg-slate-700'}`}></div>
+                       ))}
+                    </div>
+                    <button onClick={next} disabled={slide === SLIDES_DATA.length - 1} className="w-12 h-12 rounded-full bg-cyan-600 hover:bg-cyan-500 flex items-center justify-center text-white disabled:opacity-30 shadow-lg shadow-cyan-900/30 transition-all active:scale-95"><ArrowRight size={20}/></button>
+                 </div>
+              </footer>
+
+              <div className={`fixed inset-y-0 right-0 w-80 bg-slate-900 border-l border-slate-700 shadow-2xl transform transition-transform duration-300 z-[60] p-6 ${menu ? 'translate-x-0' : 'translate-x-full'}`}>
+                 <div className="flex justify-between items-center mb-8">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Navegação</span>
+                    <button onClick={() => setMenu(false)} className="hover:text-white text-slate-400"><X size={24}/></button>
+                 </div>
+                 <nav className="space-y-1 overflow-y-auto h-[calc(100%-4rem)] custom-scrollbar">
+                    {SLIDES_DATA.map((s, i) => (
+                       <button key={i} onClick={() => goto(i)} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex justify-between items-center group transition-all ${slide === i ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                          <span>{s.title}</span>
+                          {slide === i && <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_cyan]"></div>}
+                       </button>
+                    ))}
+                 </nav>
+              </div>
+            </div>
+          );
+        }
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
